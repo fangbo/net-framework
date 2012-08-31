@@ -12,13 +12,13 @@ import org.apache.log4j.Logger;
 
 import com.googlecode.FrameworkException;
 
-public class SelectorManager implements Runnable{
+public abstract class SelectorManager implements Runnable{
 
     private static final long SELECTOR_POLL_TIMEOUT = 200;
     
-    private AtomicBoolean isClosed = new AtomicBoolean(false);
+    protected AtomicBoolean isClosed = new AtomicBoolean(false);
 
-    private Selector selector;
+    protected Selector selector;
     
     private static final Logger logger = Logger.getLogger(SelectorManager.class);
     
@@ -71,6 +71,8 @@ public class SelectorManager implements Runnable{
             }
         }
     }
+    
+    protected abstract void processEvent();
 
     public void run() {
         try {
@@ -81,6 +83,8 @@ public class SelectorManager implements Runnable{
                     }
                     break;
                 }
+                
+                processEvent();
                 
                 try {
                     int selected = selector.select(SELECTOR_POLL_TIMEOUT);

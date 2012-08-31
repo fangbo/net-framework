@@ -39,9 +39,8 @@ public abstract class SelectorManagerWorker implements Runnable {
             } else if (!key.isValid()) {
                 throw new IllegalStateException("selection key is invalid!");
             }
-        } catch (Exception e) {
+        } catch (Throwable e) {
             logger.error("error in channel", e);
-        } finally {
             close();
         }
     }
