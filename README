@@ -1,1 +1,44 @@
 A simple framework for socket server written in Java.
+
+
+
+               +----------------------------------+          +-----------------------------+
+               |        FailureDetector           |          |   FailureDetectorListener   |
+               +----------------------------------+ -------->+-----------------------------+
+               |                                  |          |nodeUnavailable(Node node)   |
+               | 定义了Detector的一些抽象接口     |          |nodeAvailable(Node node)     |
+               |                                  |          |将节点的状态事件通知给外界   |  
+               +----------------------------------+          +-----------------------------+
+                               ^
+                               |
+                               |
+               +----------------------------------+          +----------------------------------+
+               |       AbstractFailureDetector    |          |       StoreVerifier              |
+               +----------------------------------+          +----------------------------------+
+               | 实现了一些公共的逻辑。           |          | verifyStore(Node node)           |
+               | 内部维护了FailureDetectorConfig  |          | 检测节点状态的抽象接口           |
+               | 节点状态列表的Map                |          | SocketStoreClientFactory和       |
+               | FailureDetectorListener的集合，  |          | HttpStoreClientFactory均实现了   |
+               | 这个集合利用ConcurrentHashMap    |          +----------------------------------+
+               | 来实现。                         |
+               +----------------------------------+
+                               ^
+                               |
+                               |
+    +-------------------------------------------------------+
+    |               AsyncRecoveryFailureDetector            |
+    +-------------------------------------------------------+
+    | 添加了一个独立的后台线程不断去判断节点的状态，        |
+    | 如果某个状态是unavailable的节点被检查到状态变为       |
+    | available，那么，setAvailable接口会被调用，同时，     |
+    | listener的nodeAvailable也会被调用。                   |
+    | 通过FailureDetectorConfig.getStoreVerifier得到        |
+    | StoreVerifier，然后调用verifyStore来检测。            |
+    +-------------------------------------------------------+
+
+
+
+
+                                 
+
+
